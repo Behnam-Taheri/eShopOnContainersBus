@@ -2,7 +2,7 @@
 
 public class EventBusRabbitMQ : IEventBus, IDisposable
 {
-    const string BROKER_NAME = "eshop_event_bus";
+    const string BROKER_NAME = "dpe_event_bus";
     const string AUTOFAC_SCOPE_NAME = "eshop_event_bus";
 
     private readonly IRabbitMQPersistentConnection _persistentConnection;
@@ -67,7 +67,7 @@ public class EventBusRabbitMQ : IEventBus, IDisposable
         using var channel = _persistentConnection.CreateModel();
         _logger.LogTrace("Declaring RabbitMQ exchange to publish event: {EventId}", @event.Id);
 
-        channel.ExchangeDeclare(exchange: BROKER_NAME, type: "direct");
+        channel.ExchangeDeclare(BROKER_NAME, "x-delayed-message", durable: true);
 
         var body = JsonSerializer.SerializeToUtf8Bytes(@event, @event.GetType(), new JsonSerializerOptions
         {
@@ -213,8 +213,8 @@ public class EventBusRabbitMQ : IEventBus, IDisposable
 
         var channel = _persistentConnection.CreateModel();
 
-        channel.ExchangeDeclare(exchange: BROKER_NAME,
-                                type: "direct");
+        channel.ExchangeDeclare(BROKER_NAME, "x-delayed-message", durable: true);
+
 
         channel.QueueDeclare(queue: _queueName,
                                 durable: true,
