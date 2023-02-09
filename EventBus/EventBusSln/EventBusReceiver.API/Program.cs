@@ -15,6 +15,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IEventBusSubscriptionsManager, InMemoryEventBusSubscriptionsManager>();
 builder.Services.AddTransient<IIntegrationEventHandler<SampleIntegrationEvent>, SampleIntegrationEventHandler>();
+builder.Services.AddTransient<IIntegrationEventHandler<ExchageTestIntegrationEvent>, ExchageTestIntegrationEventHandler>();
 
 RegisterRabbitConfiguration(builder);
 RegisterEventBus(builder);
@@ -32,6 +33,8 @@ if (app.Environment.IsDevelopment())
 var eventBus = app.Services.GetRequiredService<IEventBus>();
 
 eventBus.Subscribe<SampleIntegrationEvent, IIntegrationEventHandler<SampleIntegrationEvent>>();
+eventBus.Subscribe<ExchageTestIntegrationEvent, IIntegrationEventHandler<ExchageTestIntegrationEvent>>();
+
 app.MapControllers();
 app.Run();
 

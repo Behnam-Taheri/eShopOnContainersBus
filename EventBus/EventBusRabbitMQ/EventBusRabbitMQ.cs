@@ -67,7 +67,11 @@ public class EventBusRabbitMQ : IEventBus, IDisposable
         using var channel = _persistentConnection.CreateModel();
         _logger.LogTrace("Declaring RabbitMQ exchange to publish event: {EventId}", @event.Id);
 
-        channel.ExchangeDeclare(exchange: BROKER_NAME, type: "direct");
+        channel.ExchangeDeclare(exchange: eventName, type: "direct");
+
+        //channel.QueueUnbind(queue: _queueName,
+        //   exchange: eventName,
+        //   routingKey: eventName);
 
         var body = JsonSerializer.SerializeToUtf8Bytes(@event, @event.GetType(), new JsonSerializerOptions
         {
@@ -79,10 +83,10 @@ public class EventBusRabbitMQ : IEventBus, IDisposable
             var properties = channel.CreateBasicProperties();
             properties.DeliveryMode = 2; // persistent
 
-                _logger.LogTrace("Publishing event to RabbitMQ: {EventId}", @event.Id);
+            _logger.LogTrace("Publishing event to RabbitMQ: {EventId}", @event.Id);
 
             channel.BasicPublish(
-                exchange: BROKER_NAME,
+                exchange: eventName,
                 routingKey: eventName,
                 mandatory: true,
                 basicProperties: properties,
@@ -122,9 +126,12 @@ public class EventBusRabbitMQ : IEventBus, IDisposable
             {
                 _persistentConnection.TryConnect();
             }
- 
+
+            _consumerChannel.ExchangeDeclare(exchange: eventName,
+                                    type: "direct");
+
             _consumerChannel.QueueBind(queue: _queueName,
-                                exchange: BROKER_NAME,
+                                exchange: eventName,
                                 routingKey: eventName);
         }
     }
@@ -213,8 +220,8 @@ public class EventBusRabbitMQ : IEventBus, IDisposable
 
         var channel = _persistentConnection.CreateModel();
 
-        channel.ExchangeDeclare(exchange: BROKER_NAME,
-                                type: "direct");
+        //channel.ExchangeDeclare(exchange: _queueName + "Exchange",
+        //                        type: "direct");
 
         channel.QueueDeclare(queue: _queueName,
                                 durable: true,

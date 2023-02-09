@@ -17,9 +17,15 @@ namespace EventBus.API.Controllers
         }
 
         [HttpPost]
-        public void Publis()
+        public void Publish()
         {
             _eventBus.Publish(new SampleIntegrationEvent());
+        }
+
+        [HttpPost("PublishExchageTest")]
+        public void PublishExchageTest()
+        {
+            _eventBus.Publish(new ExchageTestIntegrationEvent());
         }
     }
 }

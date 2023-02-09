@@ -10,4 +10,12 @@ namespace EventBusReceiver.API.IntegrationEvents.EventsHandlers
             throw new NotImplementedException();
         }
     }
+
+    public class ExchageTestIntegrationEventHandler : IIntegrationEventHandler<ExchageTestIntegrationEvent>
+    {
+        public async Task Handle(ExchageTestIntegrationEvent @event)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }
